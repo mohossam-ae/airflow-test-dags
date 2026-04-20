@@ -50,9 +50,15 @@ with DAG(
         mode="reschedule",
         timeout=60 * 60 * 4,
     )
+    wait_upstream_c = ExternalTaskSensor(
+        task_id="wait_upstream_c",
+        external_dag_id="upstream_c",
+        external_task_id="finalize",
+        mode="poke",
+    )
     finalize = PythonOperator(
         task_id="finalize_monitoring",
         python_callable=_finalize,
     )
 
-    [wait_upstream_a, wait_upstream_b, wait_s3] >> finalize
+    [wait_upstream_a, wait_upstream_b, wait_s3, wait_upstream_c] >> finalize
