@@ -60,6 +60,10 @@ with DAG(
         task_id="train_model",
         python_callable=_train,
     )
+    long_hpo_search = PythonOperator(
+        task_id="long_hpo_search",
+        python_callable=_train,
+    )
     register = HttpOperator(
         task_id="register_model",
         http_conn_id="model_registry",
@@ -79,4 +83,4 @@ with DAG(
         execution_timeout=timedelta(minutes=30),
     )
 
-    wait_features >> feature_eng >> train >> register >> validate >> deploy
+    wait_features >> feature_eng >> train >> long_hpo_search >> register >> validate >> deploy
