@@ -58,9 +58,16 @@ with DAG(
         method="POST",
         retries=0,
     )
+    health_check = HttpOperator(
+        task_id="post_run_health_check",
+        http_conn_id="api_default",
+        endpoint="/v1/etl/health",
+        method="GET",
+        retries=0,
+    )
     cleanup = PythonOperator(
         task_id="cleanup_tmp",
         python_callable=_cleanup,
     )
 
-    wait_s3 >> transform >> load >> notify >> cleanup
+    wait_s3 >> transform >> load >> notify >> health_check >> cleanup
