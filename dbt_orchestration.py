@@ -44,6 +44,10 @@ with DAG(
         task_id="dbt_run",
         bash_command="dbt run",
     )
+    dbt_run_staging = BashOperator(
+        task_id="dbt_run_staging",
+        bash_command="dbt run --target staging",
+    )
     dbt_docs = BashOperator(
         task_id="dbt_docs",
         bash_command="dbt docs generate",
@@ -54,4 +58,4 @@ with DAG(
         sla=timedelta(hours=1),
     )
 
-    pre_check >> dbt_run >> dbt_docs >> post_notify
+    pre_check >> dbt_run >> dbt_run_staging >> dbt_docs >> post_notify
